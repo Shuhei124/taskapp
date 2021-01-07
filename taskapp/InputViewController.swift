@@ -7,7 +7,7 @@
 
 import UIKit
 import RealmSwift
-import UserNotifications    // 追加
+import UserNotifications
 
 class InputViewController: UIViewController {
 
@@ -22,15 +22,20 @@ class InputViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // 背景をタップしたらdismissKeyboardメソッドを呼ぶように設定する
+        // 背景をタップしたらdismissKeyboardメソッドを呼ぶように設定する(入力を閉じる処理)
+        //chap6.10 ユーザーの利便性を高めるために画面の背景をタップしたらキーボードを閉じる
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target:self, action:#selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
 
+        //ViewControllerから受け取った値の設定。プラスボタンの場合はTaskで定義したように空白になる。
+        //chap6.10・タスク一覧画面から遷移してきたときに受け取ったタスクの情報をUIに反映させる。
         tittleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
     }
-
+    
+    //元の画面に戻るときにreamを使ってtaskの内容をDBに書き込む
+    //chap6.10 ・タスク一覧画面に戻るときにUIに入力された値をデータベースに保存する。
     override func viewWillDisappear(_ animated: Bool) {
         try! realm.write {
             self.task.title = self.tittleTextField.text!
@@ -40,12 +45,15 @@ class InputViewController: UIViewController {
         }
         
         setNotification(task: task)
+        
         super.viewWillDisappear(animated)
+        //★これは何のために必要?
     }
     
     
     // タスクのローカル通知を登録する --- ここから ---
      func setNotification(task: Task) {
+        //UMMutableNotificationContentのインスタンスを作成
          let content = UNMutableNotificationContent()
          // タイトルと内容を設定(中身がない場合メッセージ無しで音だけの通知になるので「(xxなし)」を表示する)
          if task.title == "" {

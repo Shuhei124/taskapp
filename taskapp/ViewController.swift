@@ -27,34 +27,40 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // DB内のタスクが格納されるリスト。
         // 日付の近い順でソート：昇順
         // 以降内容をアップデートするとリスト内は自動的に更新される。
-        var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)  // ←追加
-
+        var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+        //★Taskクラスで定義した空のリストを作るというイメージで合っている?上のrealmのインスタンスはなぜ作成する必要がある?
+    
         // データの数（＝セルの数）を返すメソッド
         func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
             return taskArray.count
+            //taskArrayの行数(要素数)を入れている。
         }
 
-        // 各セルの内容を返すメソッド
+        // 各セルの内容を返す(表示する)メソッド
         func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
             // 再利用可能な cell を得る
             let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-            // Cellに値を設定する.  --- ここから ---
+            //withIdentifierに入っている"Cell"はTable View Cellを挿入したときにIdenfierとして設定したCell
+            
+            // cellのtextLabel?のtextに、taskArrayから取得したtitleを設定する.
             let task = taskArray[indexPath.row]
             cell.textLabel?.text = task.title
 
+            //Dateformatterクラスは日付を表すDareクラスを任意の形の文字列に変換
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm"
 
+            //cellのdetailTextLabel?のtextに、taskArrayから取得したdateを設定する.
             let dateString:String = formatter.string(from: task.date)
             cell.detailTextLabel?.text = dateString
-            // --- ここまで追加 ---
+            
             return cell
         }
 
         // 各セルを選択した時に実行されるメソッド
         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             performSegue(withIdentifier: "cellSegue", sender:nil)
-            
+            //セルを選択した時にID:cellSegueを指定してSegueさせる
         }
 
         // セルが削除が可能なことを伝えるメソッド
@@ -64,7 +70,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
         // Delete ボタンが押された時に呼ばれるメソッド
         func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-            // --- ここから ---
+            
             if editingStyle == .delete {
                 // 削除するタスクを取得する
                 let task = self.taskArray[indexPath.row]
@@ -75,8 +81,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
                 // データベースから削除する
                 try! realm.write {
-                    self.realm.delete(task)
-                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    self.realm.delete(task) //★この行はDBの行削除を意味している?
+                    tableView.deleteRows(at: [indexPath], with: .fade) //★この行は何のために必要か?
                 }
 
                 // 未通知のローカル通知一覧をログ出力
@@ -97,14 +103,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
          if segue.identifier == "cellSegue" {
              let indexPath = self.tableView.indexPathForSelectedRow
              inputViewController.task = taskArray[indexPath!.row]
+            //SegueのidentifierがcellSegueの場合、つまりセルをタップしたときにtaskArrayの内容を遷移先のtaskに入れる。
          } else {
              let task = Task()
 
              let allTasks = realm.objects(Task.self)
              if allTasks.count != 0 {
                  task.id = allTasks.max(ofProperty: "id")! + 1
+             //Taskに入っている行の数が0の場合はidが初期値ゼロで良いが、0以外の場合はDBの一番下に入れるため最大の列番+1してidを設定
              }
-
+            //idだけ決めてあげて、あとは空の状態のtaskを遷移先のtaskに入れている。
              inputViewController.task = task
          }
      }

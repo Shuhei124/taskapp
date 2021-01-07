@@ -18,3 +18,5 @@ class Task: Object {
         return "id"
     }
 }
+
+//★カラムとしてid、tittle、contents、dateを持つということで合っている?
