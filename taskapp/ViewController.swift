@@ -9,8 +9,9 @@ import UIKit
 import RealmSwift
 import UserNotifications    // 追加
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
 
+    @IBOutlet weak var categorySearch: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     
     
@@ -19,7 +20,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             // Do any additional setup after loading the view.
             tableView.delegate = self
             tableView.dataSource = self
-        }
+            categorySearch.delegate = self
+            }
     
         // Realmインスタンスを取得する
         let realm = try! Realm()  // ←追加
@@ -122,7 +124,21 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewWillAppear(animated)
         tableView.reloadData()
     }
-    
-    
-    }
 
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if let searchBarText = searchBar.text {
+            let realm = try! Realm()
+
+            let predicate = NSPredicate(format: "category = %@", searchBarText)
+            
+            taskArray = realm.objects(Task.self).filter(predicate)
+            
+            tableView.reloadData()
+        }
+    }
+    /* ★if letとは、searchBar.textがnilではない場合は、searchBarTextにsearchBar.textを
+    代入して、{以下を処理するという理解で良いか? searchBarはnil許容型のオブジェクト
+     predicateの中身には何が入っているか? print(predicate)を使ってみる方法はあるか?
+    predicateをfilterに入れることで、WHERE category = searchBarText ができるということは理解*/
+
+}

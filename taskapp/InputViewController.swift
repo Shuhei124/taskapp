@@ -13,9 +13,10 @@ class InputViewController: UIViewController {
 
 
     @IBOutlet weak var tittleTextField: UITextField!
-    @IBOutlet weak var contentsTextView: UILabel!
+    @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
-
+    @IBOutlet weak var categoryTextField: UITextField!
+    
     let realm = try! Realm()
     var task: Task!
 
@@ -32,6 +33,15 @@ class InputViewController: UIViewController {
         tittleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
+        categoryTextField.text = task.category
+        
+        let borderColor = UIColor(red: 0.9, green: 0.9, blue: 0.9, alpha: 1.0).cgColor
+        contentsTextView.layer.borderColor = borderColor
+        contentsTextView.layer.borderWidth = 0.5
+        contentsTextView.layer.cornerRadius = 5.0
+        contentsTextView.layer.masksToBounds = true
+
+        
     }
     
     //元の画面に戻るときにreamを使ってtaskの内容をDBに書き込む
@@ -41,6 +51,7 @@ class InputViewController: UIViewController {
             self.task.title = self.tittleTextField.text!
             self.task.contents = self.contentsTextView.text!
             self.task.date = self.datePicker.date
+            self.task.category = self.categoryTextField.text!
             self.realm.add(self.task, update: .modified)
         }
         
