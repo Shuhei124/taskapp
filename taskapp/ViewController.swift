@@ -30,7 +30,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // 日付の近い順でソート：昇順
         // 以降内容をアップデートするとリスト内は自動的に更新される。
         var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
-        //★Taskクラスで定義した空のリストを作るというイメージで合っている?上のrealmのインスタンスはなぜ作成する必要がある?
+        //空のリストを作るというイメージではなく、入っているものをアップデートする。
+    //★realmのインスタンスはなぜ作成する必要がある?
     
         // データの数（＝セルの数）を返すメソッド
         func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -127,18 +128,26 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let searchBarText = searchBar.text {
+            if searchBarText == ""{
+                //★以下の3行がないとエラーになるのはなぜか？
+                let realm = try! Realm()
+                taskArray = realm.objects(Task.self)
+                tableView.reloadData()
+            }else{
             let realm = try! Realm()
 
             let predicate = NSPredicate(format: "category = %@", searchBarText)
-            
+            // print("predicate=\(predicate)")
             taskArray = realm.objects(Task.self).filter(predicate)
             
             tableView.reloadData()
         }
+      }
     }
-    /* ★if letとは、searchBar.textがnilではない場合は、searchBarTextにsearchBar.textを
-    代入して、{以下を処理するという理解で良いか? searchBarはnil許容型のオブジェクト
-     predicateの中身には何が入っているか? print(predicate)を使ってみる方法はあるか?
-    predicateをfilterに入れることで、WHERE category = searchBarText ができるということは理解*/
+
+    /* if letとは、searchBar.textがnilではない場合は、searchBarTextにsearchBar.textを
+    代入して、{以下を処理する。 searchBarはnil許容型のオブジェクト
+    predicateの中身には、category=="searchBartext"が入っている。
+    predicateをfilterに入れることで、SQLで言うところのWHERE category = searchBarText ができる*/
 
 }

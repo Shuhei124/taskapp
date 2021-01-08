@@ -22,4 +22,4 @@ class Task: Object {
     }
 }
 
-//★カラムとしてid、tittle、contents、dateを持つということで合っている?
+//★カラムとしてid、tittle、contents、dateを持つということで合っている

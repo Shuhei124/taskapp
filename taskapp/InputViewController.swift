@@ -46,6 +46,9 @@ class InputViewController: UIViewController {
     //元の画面に戻るときにreamを使ってtaskの内容をDBに書き込む
     //chap6.10 ・タスク一覧画面に戻るときにUIに入力された値をデータベースに保存する。
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        //overrideで一部修正するときに親クラスの継承が必要
+        
         try! realm.write {
             self.task.title = self.tittleTextField.text!
             self.task.contents = self.contentsTextView.text!
@@ -56,8 +59,6 @@ class InputViewController: UIViewController {
         
         setNotification(task: task)
         
-        super.viewWillDisappear(animated)
-        //★これは何のために必要?
     }
     
     
